@@ -20,15 +20,15 @@ func (l *LinkedList) append(n *node) error {
 		return fmt.Errorf("n.next should be 'nil' but got [%v]", n.next)
 	}
 
-	prevHead := l.head
+	prevNode := l.head
 
 	for i := 0; i < l.length; i++ {
-		if prevHead.next == nil {
-			prevHead.next = n
+		if prevNode.next == nil {
+			prevNode.next = n
 			l.length++
 			return nil
 		}
-		prevHead = prevHead.next
+		prevNode = prevNode.next
 	}
 	return nil
 }
@@ -43,6 +43,35 @@ func (l *LinkedList) prepend(n *node) error {
 	l.head.next = prevHead // set next node as the previous head
 	l.length++             // increment linked list length
 
+	return nil
+}
+
+func (l *LinkedList) insert(index int, n *node) error {
+	if index > l.length {
+		return fmt.Errorf("index greater than linked list length: [%v] > [%v]", index, l.length)
+	}
+	if n.next != nil {
+		return fmt.Errorf("n.next should be 'nil' but got [%v]", n.next)
+	}
+
+	prevNode := l.head
+	if index == 0 {
+		n.next = prevNode
+		l.head = n
+		l.length++
+		return nil
+	}
+
+	for i := 0; i < l.length; i++ {
+		if i == index-1 {
+			n.next = prevNode.next // make `n` point to the index we want to insert, effectively replacing it
+			prevNode.next = n      // make the node before the index point to `n`
+			l.length++
+			return nil
+		}
+
+		prevNode = prevNode.next
+	}
 	return nil
 }
 
@@ -117,6 +146,11 @@ func main() {
 	l.deleteItem("Item 2")
 	fmt.Println(l.getAllData()) // [Item 1]
 
-	err = l.append(&node{value: "Appended Item 2"}) // add to the tail
-	fmt.Println(l.getAllData())                     // [Item 1, Appended Item 2]
+	l.append(&node{value: "Appended Item 2"}) // add to the tail
+	l.append(&node{value: "Appended Item 3"}) // add to the tail
+	fmt.Println(l.getAllData())               // [Item 1, Appended Item 2, Appended Item 3]
+
+	// l.length is 3, so we will insert at index 1 (index of the second node)
+	l.insert(1, &node{value: "Inserted Item 4"}) // [Item 1 Inserted Item 4 Appended Item 2 Appended Item 3]
+	fmt.Println(l.getAllData())
 }
