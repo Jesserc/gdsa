@@ -14,11 +14,7 @@ func binarySearch(items []int, value int) int {
 	high := len(items) - 1
 
 	for low <= high {
-		// fmt.Println("low", low) // uncomment this and similar ones to see the flow
-		// fmt.Println("high", high)
-
 		mid := (low + high) / 2
-		// fmt.Println("mid", mid)
 
 		if items[mid] == value {
 			return mid
@@ -26,10 +22,8 @@ func binarySearch(items []int, value int) int {
 
 		if items[mid] < value {
 			low = mid + 1
-			// fmt.Println("low", low)
 		} else {
 			high = mid - 1
-			// fmt.Println("high", high)
 		}
 	}
 	return -1
