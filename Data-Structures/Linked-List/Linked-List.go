@@ -56,9 +56,7 @@ func (l *LinkedList) insert(index int, n *node) error {
 
 	prevNode := l.head
 	if index == 0 {
-		n.next = prevNode
-		l.head = n
-		l.length++
+		l.prepend(n) // call the prepend method if the index is zero
 		return nil
 	}
 
