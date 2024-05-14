@@ -15,6 +15,24 @@ type LinkedList struct {
 	length int
 }
 
+func (l *LinkedList) append(n *node) error {
+	if n.next != nil {
+		return fmt.Errorf("n.next should be 'nil' but got [%v]", n.next)
+	}
+
+	prevHead := l.head
+
+	for i := 0; i < l.length; i++ {
+		if prevHead.next == nil {
+			prevHead.next = n
+			l.length++
+			return nil
+		}
+		prevHead = prevHead.next
+	}
+	return nil
+}
+
 func (l *LinkedList) prepend(n *node) error {
 	if n.next != nil {
 		return fmt.Errorf("n.next should be 'nil' but got [%v]", n.next)
@@ -81,7 +99,7 @@ func New(value any) *LinkedList {
 func main() {
 	l := New("Item 1")
 
-	err := l.prepend(&node{value: "Item 2"})
+	err := l.prepend(&node{value: "Item 2"}) // add to the head
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -97,5 +115,8 @@ func main() {
 	fmt.Println(l.getAllData())
 
 	l.deleteItem("Item 2")
-	fmt.Println(l.getAllData())
+	fmt.Println(l.getAllData()) // [Item 1]
+
+	err = l.append(&node{value: "Appended Item 2"}) // add to the tail
+	fmt.Println(l.getAllData())                     // [Item 1, Appended Item 2]
 }
