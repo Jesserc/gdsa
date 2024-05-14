@@ -74,13 +74,12 @@ func (l *LinkedList) getAllData() []any {
 	return d
 }
 
+func New(value any) *LinkedList {
+	return &LinkedList{head: &node{value: value}, length: 1}
+}
+
 func main() {
-	l := LinkedList{
-		head: &node{
-			value: "Item 1",
-		},
-		length: 1,
-	}
+	l := New("Item 1")
 
 	err := l.prepend(&node{value: "Item 2"})
 	if err != nil {
