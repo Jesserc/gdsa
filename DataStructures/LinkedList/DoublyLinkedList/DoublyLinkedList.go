@@ -10,12 +10,12 @@ type node struct {
 	next  *node
 }
 
-type LinkedList struct {
+type SinglyLinkedList struct {
 	head   *node
 	length int
 }
 
-func (l *LinkedList) append(n *node) error {
+func (l *SinglyLinkedList) append(n *node) error {
 	if n.next != nil {
 		return fmt.Errorf("n.next should be 'nil' but got [%v]", n.next)
 	}
@@ -33,7 +33,7 @@ func (l *LinkedList) append(n *node) error {
 	return nil
 }
 
-func (l *LinkedList) prepend(n *node) error {
+func (l *SinglyLinkedList) prepend(n *node) error {
 	if n.next != nil {
 		return fmt.Errorf("n.next should be 'nil' but got [%v]", n.next)
 	}
@@ -46,7 +46,7 @@ func (l *LinkedList) prepend(n *node) error {
 	return nil
 }
 
-func (l *LinkedList) insert(index int, n *node) error {
+func (l *SinglyLinkedList) insert(index int, n *node) error {
 	if index > l.length {
 		return fmt.Errorf("index greater than linked list length: [%v] > [%v]", index, l.length)
 	}
@@ -73,7 +73,7 @@ func (l *LinkedList) insert(index int, n *node) error {
 	return nil
 }
 
-func (l *LinkedList) deleteItem(value any) {
+func (l *SinglyLinkedList) deleteItem(value any) {
 	if l.length == 0 {
 		return
 	}
@@ -105,7 +105,7 @@ func (l *LinkedList) deleteItem(value any) {
 		prevNode = prevNode.next
 	}
 }
-func (l *LinkedList) getAllData() []any {
+func (l *SinglyLinkedList) getAllData() []any {
 	if l.length == 0 {
 		return nil
 	}
@@ -119,8 +119,8 @@ func (l *LinkedList) getAllData() []any {
 	return d
 }
 
-func New(value any) *LinkedList {
-	return &LinkedList{head: &node{value: value}, length: 1}
+func New(value any) *SinglyLinkedList {
+	return &SinglyLinkedList{head: &node{value: value}, length: 1}
 }
 
 func main() {
