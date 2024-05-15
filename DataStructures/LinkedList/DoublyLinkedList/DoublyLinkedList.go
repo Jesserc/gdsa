@@ -1,154 +1,97 @@
 package main
 
-import (
-	"fmt"
-	"log"
-)
+import "fmt"
 
 type node struct {
-	value any
-	next  *node
+	value    any
+	previous *node
+	next     *node
 }
 
-type SinglyLinkedList struct {
+type DoublyLinkedList struct {
 	head   *node
 	length int
 }
 
-func (l *SinglyLinkedList) append(n *node) error {
+func (l *DoublyLinkedList) append(n *node) error {
 	if n.next != nil {
 		return fmt.Errorf("n.next should be 'nil' but got [%v]", n.next)
 	}
 
 	prevNode := l.head
-
 	for i := 0; i < l.length; i++ {
 		if prevNode.next == nil {
+			n.previous = prevNode
 			prevNode.next = n
 			l.length++
 			return nil
 		}
 		prevNode = prevNode.next
 	}
-	return nil
-}
-
-func (l *SinglyLinkedList) prepend(n *node) error {
-	if n.next != nil {
-		return fmt.Errorf("n.next should be 'nil' but got [%v]", n.next)
-	}
-
-	prevHead := l.head
-	l.head = n             // update linked list head to the new node
-	l.head.next = prevHead // set next node as the previous head
-	l.length++             // increment linked list length
 
 	return nil
 }
 
-func (l *SinglyLinkedList) insert(index int, n *node) error {
-	if index > l.length {
-		return fmt.Errorf("index greater than linked list length: [%v] > [%v]", index, l.length)
-	}
+func (l *DoublyLinkedList) prepend(n *node) error {
 	if n.next != nil {
 		return fmt.Errorf("n.next should be 'nil' but got [%v]", n.next)
 	}
+
+	prevHead := l.head // cache the current head node
+	l.head.previous = n
+	l.head = n             // Set `n` as the new head node
+	l.head.next = prevHead // make `n` (the new head) point to the previous head node
+	l.length++
+
+	return nil
+}
+
+func (l *DoublyLinkedList) insert(index int, n *node) {
 
 	prevNode := l.head
-	if index == 0 {
-		l.prepend(n) // call the prepend method if the index is zero
-		return nil
-	}
-
 	for i := 0; i < l.length; i++ {
 		if i == index-1 {
-			n.next = prevNode.next // make `n` point to the index we want to insert, effectively replacing it
-			prevNode.next = n      // make the node before the index point to `n`
-			l.length++
-			return nil
-		}
+			// target is the node currently at the position where we want to insert the new node `n`
+			target := prevNode.next
 
+			// Set the target node's previous pointer to `n`, since `n` will be inserted right before the target
+			target.previous = n
+
+			// Set the new node's next pointer to the target node, making `n` point to the node that follows it
+			n.next = target
+
+			// Set the previous node's next pointer to `n`, so the node before the insertion point now points to `n` instead of `target`
+			prevNode.next = n
+
+			// Set the new node's previous pointer to the previous node, establishing a backward link
+			n.previous = prevNode
+		}
+		// Move to the next node in the list on each iteration
 		prevNode = prevNode.next
 	}
-	return nil
 }
-
-func (l *SinglyLinkedList) deleteItem(value any) {
-	if l.length == 0 {
-		return
-	}
-
-	if l.head.value == value { // handle case where data belongs to the first node (head)
-		l.head = l.head.next
-		l.length--
-	}
+func (l *DoublyLinkedList) getAllData() []any {
+	d := make([]any, 0)
 
 	prevNode := l.head
 	for i := 0; i < l.length; i++ {
-		if prevNode.next != nil { // we do this to handle the last node (tail)
-
-			/*
-				// this is bad because we will be deleting the next node and not the current one
-				if prevNode.value == value {
-					prevNode.next = prevNode.next.next
-				}
-			*/
-
-			// The issue from above is handled here by checking the next value
-			// The only downside is that the 'head' node won't be checked, but we're handling this above already
-			if prevNode.next.value == value {
-				prevNode.next = prevNode.next.next // skip current.next, effectively deleting it
-				l.length--                         // reduce length to indicate an item was deleted
-			}
-		}
-
+		d = append(d, prevNode.value)
 		prevNode = prevNode.next
-	}
-}
-func (l *SinglyLinkedList) getAllData() []any {
-	if l.length == 0 {
-		return nil
-	}
-
-	d := make([]any, 0)
-	currentL := l.head
-	for i := 0; i < l.length; i++ {
-		d = append(d, currentL.value)
-		currentL = currentL.next
 	}
 	return d
 }
-
-func New(value any) *SinglyLinkedList {
-	return &SinglyLinkedList{head: &node{value: value}, length: 1}
-}
-
 func main() {
-	l := New("Item 1")
-
-	err := l.prepend(&node{value: "Item 2"}) // add to the head
-	if err != nil {
-		log.Fatal(err)
+	l := DoublyLinkedList{
+		head: &node{
+			value:    "Hello world",
+			previous: nil,
+			next:     nil,
+		},
+		length: 1,
 	}
 
-	err = l.prepend(&node{value: "Item 3"})
-	if err != nil {
-		log.Fatal(err)
-	}
+	l.prepend(&node{value: "(Prepended: Hi world)"})
+	l.append(&node{value: "(Appended Hey world)"})
 
-	fmt.Println(l.getAllData())
-
-	l.deleteItem("Item 3")
-	fmt.Println(l.getAllData())
-
-	l.deleteItem("Item 2")
-	fmt.Println(l.getAllData()) // [Item 1]
-
-	l.append(&node{value: "Appended Item 2"}) // add to the tail
-	l.append(&node{value: "Appended Item 3"}) // add to the tail
-	fmt.Println(l.getAllData())               // [Item 1, Appended Item 2, Appended Item 3]
-
-	// l.length is 3, so we will insert at index 1 (index of the second node)
-	l.insert(1, &node{value: "Inserted Item 4"}) // [Item 1 Inserted Item 4 Appended Item 2 Appended Item 3]
 	fmt.Println(l.getAllData())
 }
