@@ -80,6 +80,7 @@ func (l *DoublyLinkedList) getAllData() []any {
 	}
 	return d
 }
+
 func main() {
 	l := DoublyLinkedList{
 		head: &node{
